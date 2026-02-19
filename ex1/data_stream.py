@@ -78,7 +78,7 @@ class TransactionStream(DataStream):
         except Exception:
             return "Error"
         msg = f"{data_len} operations"
-        if net_flow > 0:
+        if not net_flow == 0:
             msg += f", net flow: {'+' if net_flow > 0 else ''}{net_flow} units"
         return msg
 
@@ -91,7 +91,7 @@ class TransactionStream(DataStream):
                     for key, value in data.items()
                     if isinstance(key, str)
                     and isinstance(value, (int, float))
-                    if (key == "buy" and value >= 70)
+                    if (key == "buy" and value > 0)
                     or (key == "sell" and value >= 100)]
         return [{key: value}
                 for data in data_batch
@@ -182,8 +182,8 @@ class StreamProcessor():
                             or (key == "pressure" and (value >= 1000
                                                        or value <= 900))):
                             result[0] += 1
-                        elif ((key == "buy" and value >= 70)
-                              or (key == "sell" and value >= 100)):
+                        elif ((key == "buy" and value >= 110)
+                              or (key == "sell" and value >= 110)):
                             result[1] += 1
                         elif isinstance(data, str) and data == "error":
                             result[2] += 1
@@ -227,15 +227,17 @@ if __name__ == "__main__":
     print("Processing event batch:", event_batch)
     print("Event analysis:", event.process_batch(filter_event))
 
-    print("=== Polymorphic Stream Processing ===")
+    print("\n=== Polymorphic Stream Processing ===")
     stream = StreamProcessor([sensor, transaction, event])
     data_batch = ["login",
                   "logout",
-                  {"buy": 100},
-                  {"sell": 150},
-                  {"buy": 50},
-                  {"humidity": 65},
-                  {"pressure": 1013}]
+                  "login",
+                  {"buy": 300},
+                  {"sell": 100},
+                  {"sell": 100},
+                  {"sell": 100},
+                  {"pressure": 1013},
+                  {"humidity": 65}]
     result = stream.filter_stream(data_batch, "high-priority")
     print("Processing mixed stream types through unified interface...")
 
