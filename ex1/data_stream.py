@@ -63,7 +63,7 @@ class SensorStream(DataStream):
 
 
 class TransactionStream(DataStream):
-    def __init__(self, stream_id):
+    def __init__(self, stream_id: str):
         super().__init__(stream_id)
         self.type = "Financial Data"
 
@@ -106,7 +106,7 @@ class TransactionStream(DataStream):
 
 
 class EventStream(DataStream):
-    def __init__(self, stream_id):
+    def __init__(self, stream_id: str):
         super().__init__(stream_id)
         self.type = "System Events"
 
